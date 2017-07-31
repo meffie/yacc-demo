@@ -1,0 +1,6 @@
+calc
+lex.yy.c
+lex.yy.o
+y.tab.c
+y.tab.h
+y.tab.o
