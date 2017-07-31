@@ -3,7 +3,7 @@
 CFLAGS=-g -O0
 
 calc: y.tab.o lex.yy.o
-	$(CC) -o calc y.tab.o lex.yy.o -ly -ll -lm
+	$(CC) -o calc y.tab.o lex.yy.o -ll -lm
 
 lex.yy.o: lex.yy.c y.tab.h
 
