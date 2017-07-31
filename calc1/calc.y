@@ -1,9 +1,11 @@
-%token NUMBER
 %{
 #include <stdio.h>
+#include <stdlib.h>
 extern int yylex(void);
 extern void yyerror(const char *);
 %}
+
+%token NUMBER
 
 %%
 
@@ -20,6 +22,7 @@ expression:  expression '+' NUMBER    { $$ = $1 + $3; }
 void yyerror(const char *s)
 {
     fprintf(stderr, "%s\n", s);
+    exit(1);
 }
 
 int main(int argc, char *argv[])
