@@ -1,4 +1,3 @@
-%token NAME
 %token NUMBER
 %{
 #include <stdio.h>
@@ -8,8 +7,7 @@ extern void yyerror(const char *);
 
 %%
 
-statement: NAME '=' expression
-    |      expression                 { printf("%d\n", $1); }
+statement:   expression               { printf("%d\n", $1); }
     ;
 
 expression:  expression '+' NUMBER    { $$ = $1 + $3; }
