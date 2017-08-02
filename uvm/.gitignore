@@ -1,0 +1,7 @@
+*.bin
+*.labels
+*.o
+*.lex.c
+uasm1
+uasm2
+uvm
