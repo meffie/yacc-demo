@@ -21,11 +21,17 @@ struct label *head = NULL;
 
 %%
 nop      emit(OP_NOP);
+ton      emit(OP_TON);
+toff     emit(OP_TOFF);
 
 push     emit(OP_PUSH);
 pop      emit(OP_POP);
-swap     emit(OP_SWAP);
+peek     emit(OP_PEEK);
+poke     emit(OP_POKE);
+ipeek    emit(OP_IPEEK);
+ipoke    emit(OP_IPOKE);
 dup      emit(OP_DUP);
+swap     emit(OP_SWAP);
 
 add      emit(OP_ADD);
 sub      emit(OP_SUB);
@@ -45,7 +51,6 @@ ge       emit(OP_GE);
 
 jump     emit(OP_JUMP);
 branch   emit(OP_BRANCH);
-return   emit(OP_RETURN);
 halt     emit(OP_HALT);
 
 read     emit(OP_READ);

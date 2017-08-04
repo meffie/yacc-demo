@@ -5,11 +5,19 @@
 enum uvm_opcode {
     OP_NOP = 0,
 
+    /* debug */
+    OP_TON,
+    OP_TOFF,
+
     /* stack */
     OP_PUSH, /* <value> */
     OP_POP,
-    OP_SWAP,
+    OP_PEEK, /* <offset> */
+    OP_POKE, /* <offset> */
+    OP_IPEEK, /* <offset> */
+    OP_IPOKE, /* <offset> */
     OP_DUP,
+    OP_SWAP,
 
     /* math */
     OP_ADD,
@@ -34,7 +42,6 @@ enum uvm_opcode {
     /* control flow */
     OP_JUMP,   /* <address> */
     OP_BRANCH, /* <address> */
-    OP_RETURN,
     OP_HALT,
 
     /* i/o */

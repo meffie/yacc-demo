@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 source="$1"
 output="$2"
 if [ -z $source ]; then

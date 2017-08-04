@@ -27,35 +27,39 @@ uasm2.lex.c: uasm2.l
 
 # demo1
 demo1: demo1.bin uvm
-	./uvm --trace demo1.bin
+	@echo ==== demo1 ====
+	./uvm demo1.bin
+	@echo ===============
 
 demo1.bin: demo1.asm uasm1 uasm2
 	./uasm demo1.asm demo1.bin
-	xxd -ps demo1.bin
 
 # demo2
 demo2: demo2.bin uvm
-	./uvm --trace demo2.bin
+	@echo ==== demo2 ====
+	./uvm demo2.bin
+	@echo ===============
 
 demo2.bin: demo2.asm uasm1 uasm2
 	./uasm demo2.asm demo2.bin
-	xxd -ps demo2.bin
 
 # demo3
 demo3: demo3.bin uvm
-	./uvm --trace demo3.bin
+	@echo ==== demo3 ====
+	./uvm demo3.bin
+	@echo ===============
 
 demo3.bin: demo3.asm uasm1 uasm2
 	./uasm demo3.asm demo3.bin
-	xxd -ps demo3.bin
 
 # demo4
 demo4: demo4.bin uvm
+	@echo ==== demo4 ====
 	./uvm demo4.bin
+	@echo ===============
 
 demo4.bin: demo4.asm uasm1 uasm2
 	./uasm demo4.asm demo4.bin
-	xxd -ps demo4.bin
 
 clean:
 	rm -f *.o core
