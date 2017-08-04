@@ -1,4 +1,5 @@
 %{
+/* usm assember - second pass */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -53,8 +54,8 @@ print    emit(OP_PRINT);
 
 #.*\n            /* ignore comments */ ;
 [ \t\n]          /* ignore whitespace */ ;
-[a-z][a-z0-9]*:  /* was read in stage 1 */ ;
-[a-z][a-z0-9]*   { emitlong(lookup(yytext)); }
+[a-z][a-z0-9]*:  /* labels were read in the first pass */ ;
+\$[a-z][a-z0-9]* { emitlong(lookup(yytext+1)); }
 [0-9]+           { emitlong(atoi(yytext)); }
 .                { fprintf(stderr, "bug: %s\n", yytext); exit(1); }
 %%

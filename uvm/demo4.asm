@@ -1,6 +1,7 @@
 #
 # Demo hello world
 #
+
   push 0    # nul
   push 10   # <newline>
   push 100  # 'd'
@@ -17,7 +18,7 @@
 
 loop:
   write
-  branch loop
+  branch $loop
 
 #
 # bytecode:

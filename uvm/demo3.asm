@@ -2,16 +2,16 @@
 # Call demo
 #
 
-  push done1
+  push $done1
   push 1000
   push 2000
-  jump mysub
+  jump $mysub
 done1:
 
-  push done2
+  push $done2
   push 3000
   push 4000
-  jump mysub
+  jump $mysub
 done2:
 
   halt

@@ -1,14 +1,14 @@
 #
 # Loop demo
 #
-start:
+
   push 10
 loop:
   push 1
   sub
   dup
   print
-  branch loop
+  branch $loop
 
 #
 # bytecode:

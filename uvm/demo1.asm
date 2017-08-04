@@ -1,7 +1,7 @@
 #
 # Calculate (10 + (20 * 30))
 #
-start:
+
   push 10
   push 20
   push 30
