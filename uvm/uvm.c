@@ -1,22 +1,16 @@
 /*
  * uvm - mircro virtual machine
  *
- * This is an elementary opcode interpreter for demonstration purposes. It is a
- * stack based opcode interpreter similar to Wirth's p-code interpreter.
+ * This is an elementary opcode interpreter for demonstration purposes,
+ * similar to Wirth's p-code interpreter.
  *
- * Features
- * - stack based
- * - variable width instructions
- * - elementary i/o opcodes for demos
- * - conditional jump support for logic and loops
- * - load/store elements below the top of the stack
- * - indirect load/store for array support
- * - basic opcode and stack tracing with --trace
- *
- * Limitations
- * - 32 bit integer types only
- * - no stack frame support
- * - no heap support
+ * Differences from Wirth's p-code:
+ *   - opcodes are 8 bits followed by 0 or 1 32-bit integer
+ *   - only 1 base level
+ *   - different call setup/teardown
+ *   - added indirect peek/poke (aka load/store) for arrays
+ *   - added elementary i/o opcodes for demos
+ *   - added tracing for demos and debugging
  *
  */
 
@@ -30,7 +24,7 @@
 #include <arpa/inet.h>
 #include "uvm.h"
 
-int trace = 0; /* debugtracing */
+int trace = 0; /* debug tracing */
 
 /* opcode table */
 void (*optab[NUMOPS])(void);
@@ -45,8 +39,10 @@ int *stack = NULL;
 int stack_size = 0;
 
 /* registers */
-int pc = 0;  /* program counter */
+int pc = 0;  /* program counter (instruction pointer) */
 int sp = -1; /* stack pointer */
+int mp = 0;  /* mark pointer */
+int bp = 0;  /* base pointer (stack frames) */
 
 #define push(x) stack[++sp]=(x)
 #define pop()   stack[sp--]
@@ -66,10 +62,10 @@ void op_ton(void)    { trace = 1; }
 void op_toff(void)   { trace = 0; }
 void op_push(void)   { int arg = fetch();            push(arg); }
 void op_pop(void)    { sp--; }
-void op_peek(void)   { int o = fetch();              push(stack[o]); }
-void op_poke(void)   { int o = fetch();              stack[o] = pop(); }
-void op_ipeek(void)  { int o = fetch() + pop();      push(stack[o]); }
-void op_ipoke(void)  { int o = fetch() + pop();      stack[o] = pop(); }
+void op_peek(void)   { int o = 2+bp+fetch() ;         push(stack[o]); }
+void op_poke(void)   { int o = 2+bp + fetch();         stack[o] = pop(); }
+void op_ipeek(void)  { int o = 2+bp + fetch() + pop(); push(stack[o]); }
+void op_ipoke(void)  { int o = 2+bp + fetch() + pop(); stack[o] = pop(); }
 void op_dup(void)    { int a = pop();                push(a); push(a); }
 void op_swap(void)   { int a = pop(); int b = pop(); push(a); push(b); }
 void op_add(void)    { int a = pop(); int b = pop(); push(b + a); }
@@ -88,6 +84,11 @@ void op_gt(void)     { int a = pop(); int b = pop(); push(b > a); }
 void op_ge(void)     { int a = pop(); int b = pop(); push(b >= a); }
 void op_jump(void)   { pc = fetch(); }
 void op_branch(void) { int addr = fetch(); int a = pop(); if (a) pc = addr; }
+void op_mark(void)   { mp = sp+1; sp += 2; }
+void op_call(void)   { int addr = fetch();
+                       stack[mp] = bp; stack[mp+1] = pc; bp = mp; pc = addr; }
+void op_return(void) { pc = stack[bp+1]; bp = stack[bp]; }
+void op_unmark(void)   { sp = mp-1; mp=bp; }
 void op_halt(void)   { pc = -1; }
 void op_read(void)   { unsigned char a; fread(&a, sizeof(a), 1, stdin); push(a); }
 void op_write(void)  { unsigned char a = pop(); fwrite(&a, sizeof(a), 1, stdout); }
@@ -121,6 +122,10 @@ void init_optab(void) {
     optab[OP_GE] =     op_ge;
     optab[OP_JUMP] =   op_jump;
     optab[OP_BRANCH] = op_branch;
+    optab[OP_MARK] =   op_mark;
+    optab[OP_CALL] =   op_call;
+    optab[OP_RETURN] = op_return;
+    optab[OP_UNMARK] = op_unmark;
     optab[OP_HALT] =   op_halt;
     optab[OP_READ] =   op_read;
     optab[OP_WRITE] =  op_write;
@@ -155,6 +160,10 @@ void init_opname(void) {
     opname[OP_GE] =     "ge";
     opname[OP_JUMP] =   "jump";
     opname[OP_BRANCH] = "branch";
+    opname[OP_MARK] =   "mark";
+    opname[OP_CALL] =   "call";
+    opname[OP_RETURN] = "return";
+    opname[OP_UNMARK] = "unmark";
     opname[OP_HALT] =   "halt";
     opname[OP_READ] =   "read";
     opname[OP_WRITE] =  "write";
@@ -200,6 +209,8 @@ int main(int argc, char *argv[])
     init_optab();
     init_opname();
     read_program(*argv);
+    push(-1); /* base */
+    push(-1); /* return */
     while (pc >= 0 && pc < program_size) {
         int code = program[pc++];
         if (code < 0 || code > NUMOPS) {
@@ -207,13 +218,14 @@ int main(int argc, char *argv[])
             exit(1);
         }
         if (trace) {
-            printf("%d: %s (%d)\n", pc, opname[code], code);
+            printf("%d: %s (%d)\n", pc-1, opname[code], code);
         }
         (*optab[code])();
         if (trace) {
             int i;
+            printf("sp=%d, mp=%d, bp=%d\n", sp, mp, bp);
             printf("stack:\n");
-            for (i = sp; i >= 0; i--) {
+            for (i = sp; i >= 0 /*bp*/; i--) {
                 printf("   %d: %d\n", i, stack[i]);
             }
         }

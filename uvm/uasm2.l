@@ -51,6 +51,10 @@ ge       emit(OP_GE);
 
 jump     emit(OP_JUMP);
 branch   emit(OP_BRANCH);
+mark     emit(OP_MARK);
+call     emit(OP_CALL);
+return   emit(OP_RETURN);
+unmark   emit(OP_UNMARK);
 halt     emit(OP_HALT);
 
 read     emit(OP_READ);

@@ -42,6 +42,10 @@ enum uvm_opcode {
     /* control flow */
     OP_JUMP,   /* <address> */
     OP_BRANCH, /* <address> */
+    OP_MARK,
+    OP_CALL,
+    OP_RETURN,
+    OP_UNMARK,
     OP_HALT,
 
     /* i/o */

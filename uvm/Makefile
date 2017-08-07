@@ -1,7 +1,13 @@
-.PHONY: all clean demo1 demo2 demo3 demo4
+.PHONY: all clean
 CFLAGS=-g -O0 -Wall
+BINS=\
+ demo1.bin \
+ demo2.bin \
+ demo3.bin \
+ demo4.bin \
+ demo5.bin
 
-all: demo1 demo2 demo3 demo4
+all: $(BINS)
 
 # uvm
 uvm: uvm.o
@@ -25,41 +31,12 @@ uasm2.lex.o: uasm2.lex.c uvm.h
 uasm2.lex.c: uasm2.l
 	$(LEX) -o uasm2.lex.c uasm2.l
 
-# demo1
-demo1: demo1.bin uvm
-	@echo ==== demo1 ====
-	./uvm demo1.bin
-	@echo ===============
-
-demo1.bin: demo1.asm uasm1 uasm2
-	./uasm demo1.asm demo1.bin
-
-# demo2
-demo2: demo2.bin uvm
-	@echo ==== demo2 ====
-	./uvm demo2.bin
-	@echo ===============
-
-demo2.bin: demo2.asm uasm1 uasm2
-	./uasm demo2.asm demo2.bin
-
-# demo3
-demo3: demo3.bin uvm
-	@echo ==== demo3 ====
-	./uvm demo3.bin
-	@echo ===============
-
-demo3.bin: demo3.asm uasm1 uasm2
-	./uasm demo3.asm demo3.bin
-
-# demo4
-demo4: demo4.bin uvm
-	@echo ==== demo4 ====
-	./uvm demo4.bin
-	@echo ===============
-
-demo4.bin: demo4.asm uasm1 uasm2
-	./uasm demo4.asm demo4.bin
+# assemble and run demos
+%.bin: %.asm uasm1 uasm2 uvm
+	@echo ==== $< ====
+	./uasm $< $@
+	./uvm $@
+	@echo ==================
 
 clean:
 	rm -f *.o core
