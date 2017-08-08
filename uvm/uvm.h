@@ -19,19 +19,12 @@ enum uvm_opcode {
     OP_DUP,
     OP_SWAP,
 
-    /* math */
+    /* operations: a <- op(b, a) */
     OP_ADD,
     OP_SUB,
     OP_MUL,
     OP_DIV,
     OP_MOD,
-
-    /* logic */
-    OP_AND,
-    OP_OR,
-    OP_NOT,
-
-    /* compare */
     OP_EQ,
     OP_NE,
     OP_LT,

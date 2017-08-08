@@ -1,5 +1,5 @@
 .PHONY: all clean
-CFLAGS=-g -O0 -Wall
+CFLAGS=-g -O0 -Wall -Werror
 BINS=\
  demo1.bin \
  demo2.bin \

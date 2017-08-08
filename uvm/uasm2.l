@@ -37,11 +37,7 @@ add      emit(OP_ADD);
 sub      emit(OP_SUB);
 mul      emit(OP_MUL);
 div      emit(OP_DIV);
-
-and      emit(OP_AND);
-or       emit(OP_OR);
-not      emit(OP_NOT);
-
+mod      emit(OP_MOD);
 eq       emit(OP_EQ);
 ne       emit(OP_NE);
 lt       emit(OP_LT);
@@ -65,7 +61,7 @@ print    emit(OP_PRINT);
 [ \t\n]          /* ignore whitespace */ ;
 [a-z][a-z0-9]*:  /* labels were read in the first pass */ ;
 \$[a-z][a-z0-9]* { emitlong(lookup(yytext+1)); }
-[0-9]+           { emitlong(atoi(yytext)); }
+-?[0-9]+         { emitlong(atoi(yytext)); }
 .                { fprintf(stderr, "bug: %s\n", yytext); exit(1); }
 %%
 

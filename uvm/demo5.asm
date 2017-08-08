@@ -1,26 +1,37 @@
 #
-# Demonstrate subroutines with elementary stack frames.
+# Greatest common divisor using Euclid's method.
+#
+#   gdc(a, b):
+#       if b == 0:
+#           return a
+#       else:
+#           return gcd(b, a % b)
 #
 
-    #ton
-    mark       # mark new frame
-    push 100   # call parameters
-    push 200
-    call $mysub1  # invoke call
-    nop
-    unmark
-    halt
+main:
+    push 0        # make a slot for the result
+    mark          # setup parameters
+    push 21       # 0:a
+    push 30       # 1:b
+    call $gcd     # gcd(21, 30)
+    poke 0        # save result
+    unmark        # unwind frame
+    print         # print result
+    halt          # all done
 
-mysub1:
-    add
-    mark    # mark new frame
-    peek 0  # set call parameter from local
-    push 2  # set call parameter with literal
-    call $mysub2
-    poke 0  # save return to local
-    unmark  # teardown frame
-    return
-
-mysub2:
-    mul
-    return
+gcd:
+    peek 1        # b
+    branch $again # b != 0 ?
+    pop           # yes: toss b
+    return        # a
+again:
+    mark          # setup parameters
+    peek 1        # b
+    peek 0        # a
+    peek 1        # b
+    mod           # a % b
+    call $gcd     # gcd(b, a % b)
+    poke 0        # save result (clobbers old a)
+    unmark        # unwind frame
+    pop           # toss b
+    return        # a

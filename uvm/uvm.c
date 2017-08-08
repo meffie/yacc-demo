@@ -7,7 +7,7 @@
  * Differences from Wirth's p-code:
  *   - opcodes are 8 bits followed by 0 or 1 32-bit integer
  *   - only 1 base level
- *   - different call setup/teardown
+ *   - different call frame setup/teardown
  *   - added indirect peek/poke (aka load/store) for arrays
  *   - added elementary i/o opcodes for demos
  *   - added tracing for demos and debugging
@@ -24,11 +24,8 @@
 #include <arpa/inet.h>
 #include "uvm.h"
 
-int trace = 0; /* debug tracing */
-
 /* opcode table */
 void (*optab[NUMOPS])(void);
-char *opname[NUMOPS]; /* for tracing */
 
 /* code buffer */
 char *program = NULL;
@@ -36,7 +33,7 @@ int program_size = 0;
 
 /* stack buffer */
 int *stack = NULL;
-int stack_size = 0;
+int stack_size = 4096;
 
 /* registers */
 int pc = 0;  /* program counter (instruction pointer) */
@@ -44,8 +41,21 @@ int sp = -1; /* stack pointer */
 int mp = 0;  /* mark pointer */
 int bp = 0;  /* base pointer (stack frames) */
 
-#define push(x) stack[++sp]=(x)
-#define pop()   stack[sp--]
+/* tracing */
+int trace = 0;
+#define T(x)    if (trace) printf("%s\n", (x))
+#define T1(x,y) if (trace) printf("%s %d\n", (x), (y))
+#define TS()    if (trace) trace_stack()
+void trace_stack(void)
+{
+    int i;
+    printf("pc:%d sp:%d bp:%d mp:%d\n", pc, sp, bp, mp);
+    printf("stack:\n");
+    for (i = sp; i >= 0; i--) {
+        printf("   %d: %d\n", i, stack[i]);
+    }
+    printf("\n");
+}
 
 /* fetch next argument */
 int fetch(void)
@@ -57,43 +67,44 @@ int fetch(void)
 }
 
 /* opcodes */
-void op_nop(void)    { ; }
-void op_ton(void)    { trace = 1; }
-void op_toff(void)   { trace = 0; }
-void op_push(void)   { int arg = fetch();            push(arg); }
-void op_pop(void)    { sp--; }
-void op_peek(void)   { int o = 2+bp+fetch() ;         push(stack[o]); }
-void op_poke(void)   { int o = 2+bp + fetch();         stack[o] = pop(); }
-void op_ipeek(void)  { int o = 2+bp + fetch() + pop(); push(stack[o]); }
-void op_ipoke(void)  { int o = 2+bp + fetch() + pop(); stack[o] = pop(); }
-void op_dup(void)    { int a = pop();                push(a); push(a); }
-void op_swap(void)   { int a = pop(); int b = pop(); push(a); push(b); }
-void op_add(void)    { int a = pop(); int b = pop(); push(b + a); }
-void op_sub(void)    { int a = pop(); int b = pop(); push(b - a); }
-void op_mul(void)    { int a = pop(); int b = pop(); push(b * a); }
-void op_div(void)    { int a = pop(); int b = pop(); push(b / a); }
-void op_mod(void)    { int a = pop(); int b = pop(); push(b % a); }
-void op_and(void)    { int a = pop(); int b = pop(); push(b && a); }
-void op_or(void)     { int a = pop(); int b = pop(); push(b || a); }
-void op_not(void)    { int a = pop();                push(!a); }
-void op_eq(void)     { int a = pop(); int b = pop(); push(b == a); }
-void op_ne(void)     { int a = pop(); int b = pop(); push(b != a); }
-void op_lt(void)     { int a = pop(); int b = pop(); push(b < a);  }
-void op_le(void)     { int a = pop(); int b = pop(); push(b <= a); }
-void op_gt(void)     { int a = pop(); int b = pop(); push(b > a); }
-void op_ge(void)     { int a = pop(); int b = pop(); push(b >= a); }
-void op_jump(void)   { pc = fetch(); }
-void op_branch(void) { int addr = fetch(); int a = pop(); if (a) pc = addr; }
-void op_mark(void)   { mp = sp+1; sp += 2; }
-void op_call(void)   { int addr = fetch();
-                       stack[mp] = bp; stack[mp+1] = pc; bp = mp; pc = addr; }
-void op_return(void) { pc = stack[bp+1]; bp = stack[bp]; }
-void op_unmark(void)   { sp = mp-1; mp=bp; }
-void op_halt(void)   { pc = -1; }
-void op_read(void)   { unsigned char a; fread(&a, sizeof(a), 1, stdin); push(a); }
-void op_write(void)  { unsigned char a = pop(); fwrite(&a, sizeof(a), 1, stdout); }
-void op_print(void)  { printf("%d\n", pop()); }
+#define push(x)    stack[++sp]=(x)
+#define pop()      stack[sp--]
+#define peek(x)    stack[(x)]
+#define poke(x, y) stack[(x)] = y
+void op_nop(void)    { T("nop"); }
+void op_ton(void)    { trace = 1; T("ton"); }
+void op_toff(void)   { T("toff"); trace = 0; }
+void op_push(void)   { int a = fetch(); T1("push", a); push(a); }
+void op_pop(void)    { T("pop"); sp--; }
+void op_peek(void)   { int a = fetch(); T1("peek", a); a += bp+2; push(peek(a)); }
+void op_poke(void)   { int a = fetch(); T1("poke", a); a += bp+2; poke(a, pop()); }
+void op_ipeek(void)  { int a = fetch(); T1("ipeek", a); a += pop()+bp+2; push(peek(a)); }
+void op_ipoke(void)  { int a = fetch(); T1("ipoke", a); a += pop()+bp+2; poke(a, pop()); }
+void op_dup(void)    { int a = pop(); T("dup"); push(a); push(a); }
+void op_swap(void)   { int a = pop(); int b = pop(); T("swap"); push(a); push(b); }
+void op_add(void)    { int a = pop(); int b = pop(); T("add");  push(b + a); }
+void op_sub(void)    { int a = pop(); int b = pop(); T("sub");  push(b - a); }
+void op_mul(void)    { int a = pop(); int b = pop(); T("mul");  push(b * a); }
+void op_div(void)    { int a = pop(); int b = pop(); T("div");  push(b / a); }
+void op_mod(void)    { int a = pop(); int b = pop(); T("mod");  push(b % a); }
+void op_eq(void)     { int a = pop(); int b = pop(); T("eq");   push(b == a); }
+void op_ne(void)     { int a = pop(); int b = pop(); T("ne");   push(b != a); }
+void op_lt(void)     { int a = pop(); int b = pop(); T("lt");   push(b < a);  }
+void op_le(void)     { int a = pop(); int b = pop(); T("le");   push(b <= a); }
+void op_gt(void)     { int a = pop(); int b = pop(); T("gt");   push(b > a); }
+void op_ge(void)     { int a = pop(); int b = pop(); T("ge");   push(b >= a); }
+void op_jump(void)   { int a = fetch(); T1("jump", a); pc = a; }
+void op_branch(void) { int a = fetch(); T1("branch", a); if (pop()) pc = a; }
+void op_mark(void)   { T("mark"); mp = sp+1; sp += 2; }
+void op_call(void)   { int a = fetch(); T1("call", a); poke(mp,bp); poke(mp+1,pc); bp = mp; pc = a; }
+void op_return(void) { T("return"); pc = peek(bp+1); bp = peek(bp); }
+void op_unmark(void) { T("unmark"); sp = mp-1; mp=bp; }
+void op_halt(void)   { T("halt"); pc = -1; }
+void op_read(void)   { unsigned char a; T("read"); fread(&a, sizeof(a), 1, stdin); push(a); }
+void op_write(void)  { unsigned char a = pop(); T("write"); fwrite(&a, sizeof(a), 1, stdout); }
+void op_print(void)  { T("print"); printf("%d\n", pop()); }
 
+/* initalize the opcode table */
 void init_optab(void) {
     memset(optab, 0, sizeof(optab));
     optab[OP_NOP] =    op_nop;
@@ -111,9 +122,7 @@ void init_optab(void) {
     optab[OP_SUB] =    op_sub;
     optab[OP_MUL] =    op_mul;
     optab[OP_DIV] =    op_div;
-    optab[OP_AND] =    op_and;
-    optab[OP_OR] =     op_or;
-    optab[OP_NOT] =    op_not;
+    optab[OP_MOD] =    op_mod;
     optab[OP_EQ] =     op_eq;
     optab[OP_NE] =     op_ne;
     optab[OP_LT] =     op_lt;
@@ -132,44 +141,7 @@ void init_optab(void) {
     optab[OP_PRINT] =  op_print;
 }
 
-void init_opname(void) {
-    memset(opname, 0, sizeof(opname));
-    opname[OP_NOP] =    "nop";
-    opname[OP_TON] =    "ton";
-    opname[OP_TOFF] =   "toff";
-    opname[OP_PUSH] =   "push";
-    opname[OP_POP] =    "pop";
-    opname[OP_PEEK] =   "peek";
-    opname[OP_POKE] =   "poke";
-    opname[OP_IPEEK] =  "ipeek";
-    opname[OP_IPOKE] =  "ipoke";
-    opname[OP_DUP] =    "dup";
-    opname[OP_SWAP] =   "swap";
-    opname[OP_ADD] =    "add";
-    opname[OP_SUB] =    "sub";
-    opname[OP_MUL] =    "mul";
-    opname[OP_DIV] =    "div";
-    opname[OP_AND] =    "and";
-    opname[OP_OR] =     "or";
-    opname[OP_NOT] =    "not";
-    opname[OP_EQ] =     "eq";
-    opname[OP_NE] =     "ne";
-    opname[OP_LT] =     "lt";
-    opname[OP_LE] =     "le";
-    opname[OP_GT] =     "gt";
-    opname[OP_GE] =     "ge";
-    opname[OP_JUMP] =   "jump";
-    opname[OP_BRANCH] = "branch";
-    opname[OP_MARK] =   "mark";
-    opname[OP_CALL] =   "call";
-    opname[OP_RETURN] = "return";
-    opname[OP_UNMARK] = "unmark";
-    opname[OP_HALT] =   "halt";
-    opname[OP_READ] =   "read";
-    opname[OP_WRITE] =  "write";
-    opname[OP_PRINT] =  "print";
-};
-
+/* read program into memory */
 int read_program(char *filename)
 {
     FILE *fp = NULL;
@@ -195,40 +167,23 @@ int read_program(char *filename)
 
 int main(int argc, char *argv[])
 {
-    if (argc < 2) {
-        fprintf(stderr, "usage: uvm [--trace] <program>\n");
+    if (argc != 2) {
+        fprintf(stderr, "usage: uvm <program>\n");
         exit(1);
     }
-    argv++;
-    if (strcmp(*argv, "--trace")==0) {
-        trace = 1;
-        argv++;
-    }
-    stack_size = 256;
     stack = calloc(stack_size, sizeof(*stack));
     init_optab();
-    init_opname();
-    read_program(*argv);
+    read_program(argv[1]);
     push(-1); /* base */
     push(-1); /* return */
     while (pc >= 0 && pc < program_size) {
         int code = program[pc++];
         if (code < 0 || code > NUMOPS) {
-            fprintf(stderr, "uvm: invalid opcode %d\n", code);
+            fprintf(stderr, "uvm: invalid opcode %d at %d\n", code, pc-1);
             exit(1);
         }
-        if (trace) {
-            printf("%d: %s (%d)\n", pc-1, opname[code], code);
-        }
         (*optab[code])();
-        if (trace) {
-            int i;
-            printf("sp=%d, mp=%d, bp=%d\n", sp, mp, bp);
-            printf("stack:\n");
-            for (i = sp; i >= 0 /*bp*/; i--) {
-                printf("   %d: %d\n", i, stack[i]);
-            }
-        }
+        TS();
     }
     return 0;
 }
