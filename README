@@ -1,3 +1,9 @@
 lex/yacc demos
 
-Infix calculator demo based on the Lex & Yacc by John Levine et al.
+This is a set of demos for the classic lex and yacc tools.
+
+* calc
+  - Infix calculator demo based on the Lex & Yacc by John Levine et al.
+* umv
+  - micro vm (p-code-like) demo and assembler (lex demo)
+
