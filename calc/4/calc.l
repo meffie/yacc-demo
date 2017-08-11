@@ -4,6 +4,8 @@
 #include <math.h>
 extern YYSTYPE yylval;
 %}
+%option nounput
+%option noinput
 
 %%
 [0-9]+	        |

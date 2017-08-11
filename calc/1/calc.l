@@ -2,6 +2,8 @@
 #include "y.tab.h"
 extern int yylval;
 %}
+%option nounput
+%option noinput
 
 %%
 [0-9]+	{ yylval = atoi(yytext); return NUMBER; }

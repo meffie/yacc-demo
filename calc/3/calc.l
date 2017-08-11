@@ -4,6 +4,8 @@
 extern YYSTYPE yylval;
 extern double vtable[26];
 %}
+%option nounput
+%option noinput
 
 %%
 [0-9]+	        |

@@ -1,6 +1,4 @@
-
-
-CFLAGS=-g -O0
+CFLAGS=-g -O0 -Wall -Werror
 
 calc: y.tab.o lex.yy.o
 	$(CC) -o calc y.tab.o lex.yy.o -ll -lm
