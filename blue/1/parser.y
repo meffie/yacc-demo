@@ -30,10 +30,10 @@ int enable_debug = 1;
 %token NE
 %token NOT
 %token OR
+%token PRINT
 %token THEN
 %token VAR
 %token WHILE
-%token PRINT
 
 %token <number> NUMBER
 %token <string> NAME
@@ -46,7 +46,7 @@ int enable_debug = 1;
 
 %%
 
-program: statements
+program: statements              { debug("program -> statements"); }
        ;
 
 statements: statements statement { debug("statements -> statements statement"); }
@@ -106,7 +106,7 @@ void debug(char *fmt, ...)
     va_list ap;
     va_start(ap, fmt);
     if (enable_debug) {
-        printf("   --> ");
+        printf(" ** ");
         vprintf(fmt, ap);
         printf("\n");
     }
