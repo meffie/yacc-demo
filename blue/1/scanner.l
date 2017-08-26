@@ -13,7 +13,7 @@ extern YYSTYPE yylval;
 %option nounput
 %option noinput
 
-nl \n
+eos [;\n]
 comment [/][/].*\n
 ws [ \t]+
 number [0-9]+
@@ -50,9 +50,10 @@ print     { TOKEN(PRINT); }
 {lt}      { TOKEN(LT); }
 {ne}      { TOKEN(NE); }
 
+{eos}     { TOKEN(EOS); }
+
 {number}  { yylval.number = atoi(yytext); ldebug("number=%d", yylval.number); return NUMBER; }
 {name}    { yylval.string = strdup(yytext); ldebug("name='%s'", yylval.string); return NAME; }
-\n        { ldebug("ch='\\n'"); return yytext[0]; }
 .         { ldebug("ch='%c'", yytext[0]); return yytext[0]; }
 %%
 

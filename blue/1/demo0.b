@@ -1,9 +1,5 @@
 // This is a comment.
 
-// variables
-var x
-var y
-
 // assigmnents
 let x = 1
 let y = x + 2
@@ -13,6 +9,7 @@ let w = ((1+2) * x) / (y - 2)
 // print
 print 1
 print x + y
+print x; print y
 
 // conditional
 
@@ -46,4 +43,6 @@ while x > 0 do
     let x = x - 1
     print x
 end
+
+while x > 0 do; print x; end
 
