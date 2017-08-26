@@ -1,7 +1,5 @@
 *.bin
-*.labels
 *.o
-*.lex.c
-uasm1
-uasm2
+lex.yy.c
+uasm
 uvm
