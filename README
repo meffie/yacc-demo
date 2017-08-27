@@ -4,6 +4,10 @@ This is a set of demos for the classic lex and yacc tools.
 
 * calc
   - Infix calculator demo based on the Lex & Yacc by John Levine et al.
+* yblog
+  - example document generation tool
 * umv
   - micro vm (p-code-like) demo and assembler (lex demo)
+* blue
+  - demo compiler to uvm bytecode
 
