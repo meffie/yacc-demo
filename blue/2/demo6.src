@@ -1,0 +1,8 @@
+while x < 20 do
+    if (x % 3) = 0 then
+        print -1
+    else
+        print x
+    end
+    let x = x + 1
+end

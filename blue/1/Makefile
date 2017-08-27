@@ -15,4 +15,4 @@ clean:
 	rm -f blue *.o y.tab.c y.tab.h lex.yy.c y.output
 
 demo: blue
-	./blue demo0.b
+	./blue demo0.src
