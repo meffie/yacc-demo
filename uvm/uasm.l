@@ -43,6 +43,9 @@ lt       opcode(OP_LT);
 le       opcode(OP_LE);
 gt       opcode(OP_GT);
 ge       opcode(OP_GE);
+and      opcode(OP_AND);
+or       opcode(OP_OR);
+not      opcode(OP_NOT);
 jump     opcode(OP_JUMP);
 branch   opcode(OP_BRANCH);
 mark     opcode(OP_MARK);
@@ -54,12 +57,12 @@ read     opcode(OP_READ);
 write    opcode(OP_WRITE);
 print    opcode(OP_PRINT);
 
-#.*\n            /* ignore comments */ ;
-[ \t\n]          /* ignore whitespace */ ;
-[a-z][a-z0-9]*:  { yytext[yyleng-1] = '\0'; label(yytext); }
-\$[a-z][a-z0-9]* ident(yytext+1);
--?[0-9]+         number(atoi(yytext));
-.                error("unexpected char %s\n");
+#.*\n              /* ignore comments */ ;
+[ \t\n]            /* ignore whitespace */;
+[a-z_][a-z0-9_]*:  { yytext[yyleng-1] = '\0'; label(yytext); }
+\$[a-z_][a-z0-9_]* ident(yytext+1);
+-?[0-9]+           number(atoi(yytext));
+.                  error("unexpected char %s\n", yytext);
 
 %%
 

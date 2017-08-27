@@ -1,5 +1,5 @@
 /*
- * uvm - mircro virtual machine
+ * uvm - micro virtual machine
  *
  * This is an elementary opcode interpreter for demonstration purposes,
  * similar to Wirth's p-code interpreter.
@@ -93,6 +93,9 @@ void op_lt(void)     { int a = pop(); int b = pop(); T("lt");   push(b < a);  }
 void op_le(void)     { int a = pop(); int b = pop(); T("le");   push(b <= a); }
 void op_gt(void)     { int a = pop(); int b = pop(); T("gt");   push(b > a); }
 void op_ge(void)     { int a = pop(); int b = pop(); T("ge");   push(b >= a); }
+void op_and(void)    { int a = pop(); int b = pop(); T("and");  push(b && a); }
+void op_or(void)     { int a = pop(); int b = pop(); T("or");  push(b || a); }
+void op_not(void)    { int a = pop();                T("not");  push(!a); }
 void op_jump(void)   { int a = fetch(); T1("jump", a); pc = a; }
 void op_branch(void) { int a = fetch(); T1("branch", a); if (pop()) pc = a; }
 void op_mark(void)   { T("mark"); mp = sp+1; sp += 2; }
@@ -129,6 +132,9 @@ void init_optab(void) {
     optab[OP_LE] =     op_le;
     optab[OP_GT] =     op_gt;
     optab[OP_GE] =     op_ge;
+    optab[OP_AND] =    op_and;
+    optab[OP_OR] =     op_or;
+    optab[OP_NOT] =    op_not;
     optab[OP_JUMP] =   op_jump;
     optab[OP_BRANCH] = op_branch;
     optab[OP_MARK] =   op_mark;

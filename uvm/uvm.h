@@ -31,6 +31,11 @@ enum uvm_opcode {
     OP_LE,
     OP_GT,
     OP_GE,
+    OP_AND,
+    OP_OR,
+
+    /* operations: a <- op(a) */
+    OP_NOT,
 
     /* control flow */
     OP_JUMP,   /* <address> */
