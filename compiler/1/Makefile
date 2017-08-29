@@ -1,3 +1,4 @@
+.PHONY: demo clean
 CFLAGS=-g -O0 -Wall -Werror
 
 blue: y.tab.o lex.yy.o
