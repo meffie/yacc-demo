@@ -13,9 +13,8 @@ extern YYSTYPE yylval;
 %option nounput
 %option noinput
 
-eos [;\n]
 comment [/][/].*\n
-ws [ \t]+
+ws [ \t\n]+
 number -?[0-9]+
 name [a-zA-Z_][a-zA-Z0-9_]*
 eq   =
@@ -49,8 +48,6 @@ print     { TOKEN(PRINT); }
 {le}      { TOKEN(LE); }
 {lt}      { TOKEN(LT); }
 {ne}      { TOKEN(NE); }
-
-{eos}     { TOKEN(EOS); }
 
 {number}  { yylval.number = atoi(yytext); ldebug("number=%d", yylval.number); return NUMBER; }
 {name}    { yylval.string = strdup(yytext); ldebug("name='%s'", yylval.string); return NAME; }

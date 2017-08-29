@@ -20,7 +20,6 @@ int enable_debug = 1;
 %token DO
 %token ELSE
 %token END
-%token EOS
 %token EQ
 %token GE
 %token GT
@@ -61,22 +60,22 @@ statement: var_statement         { debug("statement -> var_statement"); }
          | while_statement       { debug("statement -> while_statement"); }
          ;
 
-var_statement: VAR NAME EOS
-        { debug("var_statement -> VAR NAME=%s EOS", $2); }
+var_statement: VAR NAME
+        { debug("var_statement -> VAR NAME=%s", $2); }
 
-let_statement: LET NAME EQ exp EOS
-        { debug("let_statement -> LET NAME EQ exp EOS"); }
+let_statement: LET NAME EQ exp
+        { debug("let_statement -> LET NAME EQ exp"); }
 
-print_statement: PRINT exp EOS
-        { debug("print_statement -> PRINT exp EOS"); }
+print_statement: PRINT exp
+        { debug("print_statement -> PRINT exp"); }
 
-if_statement: IF cond DO EOS statements END EOS
-                 { debug("if_statement -> IF cond DO EOS statements END EOS"); }
-            | IF cond THEN EOS statements ELSE EOS statements END EOS
-                 { debug("if_statement -> IF cond THEN EOS statements ELSE EOS statements END EOS"); }
+if_statement: IF cond DO statements END
+                 { debug("if_statement -> IF cond DO statements END"); }
+            | IF cond THEN statements ELSE statements END
+                 { debug("if_statement -> IF cond THEN statements ELSE statements END"); }
 
-while_statement: WHILE cond DO EOS statements END EOS
-        { debug("while_statement -> WHILE cond DO EOS statements END EOS"); }
+while_statement: WHILE cond DO statements END
+        { debug("while_statement -> WHILE cond DO statements END"); }
 
 cond: exp EQ exp         { debug("cond -> exp EQ exp"); }
     | exp NE exp         { debug("cond -> exp NE exp"); }

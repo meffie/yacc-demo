@@ -9,7 +9,8 @@ let w = ((1+2) * x) / (y - 2)
 // print
 print 1
 print x + y
-print x; print y
+print x
+print y
 
 // conditional
 
@@ -44,5 +45,5 @@ while x > 0 do
     print x
 end
 
-while x > 0 do; print x; end
+while x > 0 do print x end
 

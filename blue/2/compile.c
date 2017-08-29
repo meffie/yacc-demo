@@ -157,7 +157,7 @@ void walk(struct node *node)
             walk(verb->arg[0]);
             walk(verb->arg[1]);
             switch (verb->vid) {
-            case EOS: break;
+            case ';': break;
             case '+': emit("\tadd\n"); break;
             case '*': emit("\tmul\n"); break;
             case '-': emit("\tsub\n"); break;

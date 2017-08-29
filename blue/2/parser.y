@@ -24,7 +24,6 @@ extern int enable_debug;
 %token DO
 %token ELSE
 %token END
-%token EOS
 %token EQ
 %token GE
 %token GT
@@ -59,7 +58,8 @@ program: statements              { debug("program -> statements");
                                    walk($1); }
        ;
 
-statements: statements statement { debug("statements -> statements statement"); $$ = verb(EOS, 2, $1, $2); }
+statements: statements statement { debug("statements -> statements statement");
+                                   $$ = verb(';', 2, $1, $2); }
           | statement            { debug("statements -> statement"); }
           ;
 
@@ -69,24 +69,24 @@ statement: let_statement         { debug("statement -> let_statement"); }
          | while_statement       { debug("statement -> while_statement"); }
          ;
 
-let_statement: LET NAME EQ exp EOS
-        { debug("let_statement -> LET NAME EQ exp EOS");
+let_statement: LET NAME EQ exp
+        { debug("let_statement -> LET NAME EQ exp");
           $$ = verb(LET, 2, symbol($2), $4); }
 
-print_statement: PRINT exp EOS
-        { debug("print_statement -> PRINT exp EOS");
+print_statement: PRINT exp
+        { debug("print_statement -> PRINT exp");
           $$ = verb(PRINT, 1, $2); }
 
-if_statement: IF cond DO EOS statements END EOS
-                 { debug("if_statement -> IF cond DO EOS statements END EOS");
-                   $$ = verb(IF, 2, $2, $5); }
-            | IF cond THEN EOS statements ELSE EOS statements END EOS
-                 { debug("if_statement -> IF cond THEN EOS statements ELSE EOS statements END EOS");
-                   $$ = verb(IF, 3, $2, $5, $8); }
+if_statement: IF cond DO statements END
+                 { debug("if_statement -> IF cond DO statements END");
+                   $$ = verb(IF, 2, $2, $4); }
+            | IF cond THEN statements ELSE statements END
+                 { debug("if_statement -> IF cond THEN statements ELSE statements END");
+                   $$ = verb(IF, 3, $2, $4, $6); }
 
-while_statement: WHILE cond DO EOS statements END EOS
-        { debug("while_statement -> WHILE cond DO EOS statements END EOS");
-          $$ = verb(WHILE, 2, $2, $5); }
+while_statement: WHILE cond DO statements END
+        { debug("while_statement -> WHILE cond DO statements END");
+          $$ = verb(WHILE, 2, $2, $4); }
 
 cond: exp EQ exp         { debug("cond -> exp EQ exp"); $$ = verb(EQ, 2, $1, $3); }
     | exp NE exp         { debug("cond -> exp NE exp"); $$ = verb(NE, 2, $1, $3); }

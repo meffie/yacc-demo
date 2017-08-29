@@ -1,4 +1,6 @@
 *.o
+*.asm
+*.bin
 blue
 lex.yy.c
 y.tab.c
