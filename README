@@ -7,7 +7,7 @@ This is a set of demos for the classic lex and yacc tools.
 * yblog
   - example document generation tool
 * umv
-  - micro vm (p-code-like) demo and assembler (lex demo)
-* blue
+  - micro vm (p-code like) demo and assembler (lex demo) for compiler
+* compiler
   - demo compiler to uvm bytecode
 
