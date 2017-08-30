@@ -1,0 +1,5 @@
+*.bin
+*.o
+lex.yy.c
+uasm
+uvm
