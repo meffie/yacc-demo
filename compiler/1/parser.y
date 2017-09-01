@@ -53,15 +53,11 @@ statements: statements statement { debug("statements -> statements statement"); 
           | statement            { debug("statements -> statement"); }
           ;
 
-statement: var_statement         { debug("statement -> var_statement"); }
-         | let_statement         { debug("statement -> let_statement"); }
+statement: let_statement         { debug("statement -> let_statement"); }
          | print_statement       { debug("statement -> print_statement"); }
          | if_statement          { debug("statement -> if_statement"); }
          | while_statement       { debug("statement -> while_statement"); }
          ;
-
-var_statement: VAR NAME
-        { debug("var_statement -> VAR NAME=%s", $2); }
 
 let_statement: LET NAME EQ exp
         { debug("let_statement -> LET NAME EQ exp"); }

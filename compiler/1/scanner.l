@@ -39,7 +39,6 @@ not       { TOKEN(NOT); }
 or        { TOKEN(OR); }
 then      { TOKEN(THEN); }
 while     { TOKEN(WHILE); }
-var       { TOKEN(VAR); }
 print     { TOKEN(PRINT); }
 
 {eq}      { TOKEN(EQ); }
