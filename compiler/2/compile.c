@@ -124,7 +124,7 @@ void walk(struct node *node)
             break;
         case PRINT:
             walk(verb->arg[0]);
-            emit("\tprint\n"); break;
+            emit("\tprint\n");
             break;
         case IF:
             label0 = label++;
@@ -173,7 +173,7 @@ void walk(struct node *node)
             case OR:  emit("\tor\n");  break;
             default: yyerror("invalid verb"); break;
             }
+            break;
         }
     }
 }
-
